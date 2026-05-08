@@ -12,6 +12,20 @@ body{font-family:'Poppins',sans-serif;background:linear-gradient(135deg,#f7e7e3,
 .title{font-size:3rem;color:#c25b73;margin-bottom:10px}
 .subtitle{opacity:.8;margin-bottom:30px}
 .photo{width:290px;max-width:90%;height:370px;object-fit:cover;border-radius:25px;box-shadow:0 10px 30px rgba(0,0,0,.18);margin-bottom:30px}
+.slideshow{position:relative;width:900px;max-width:100%;height:420px;margin:0 auto 30px}
+.slide{position:absolute;top:0;left:50%;width:280px;height:380px;object-fit:cover;border-radius:25px;
+box-shadow:0 10px 30px rgba(0,0,0,.18);opacity:0;transform:translateX(-50%) scale(.85);
+transition:all 1.5s ease}
+.slide.active{opacity:1;transform:translateX(-50%) scale(1);z-index:3}
+.slide.prev{opacity:.65;transform:translateX(calc(-50% - 260px)) scale(.9);z-index:2}
+.slide.next{opacity:.65;transform:translateX(calc(-50% + 260px)) scale(.9);z-index:2}
+@media (max-width: 768px){
+  .slideshow{height:360px}
+  .slide{width:220px;height:320px}
+  .slide.prev{transform:translateX(calc(-50% - 120px)) scale(.85)}
+  .slide.next{transform:translateX(calc(-50% + 120px)) scale(.85)}
+}
+
 .letter{max-width:800px;margin:0 auto;background:rgba(255,255,255,.65);padding:35px;border-radius:30px;backdrop-filter:blur(10px);box-shadow:0 8px 25px rgba(0,0,0,.08);text-align:left;line-height:2;font-size:1.08rem;min-height:220px}
 .cursor{display:inline-block;animation:blink .8s infinite;color:#c25b73;font-weight:700}
 @keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
@@ -27,7 +41,14 @@ footer{margin-top:40px;opacity:.75}
 <div class="container">
 <h1 class="title">To Angela ❤️</h1>
 <p class="subtitle">A little piece of my heart for you ✨</p>
-<img class="photo" src="photo1.jpg" alt="Angela and Imna" />
+
+    <div class="slideshow">
+        <img class="slide active" src="photo1.jpg" alt="Memory 1" />
+        <img class="slide" src="photo2.jpg" alt="Memory 2" />
+        <img class="slide" src="photo3.jpg" alt="Memory 3" />
+        <img class="slide" src="photo4.jpg" alt="Memory 4" />
+    </div>
+    
 <div class="letter">
   <div id="typedLetter"></div>
   <span id="cursor" class="cursor">|</span>
@@ -91,12 +112,35 @@ function toggleMusic() {
     if (!typingStarted) {
       typingStarted = true;
       typeHTML(letterText, typedLetter, 35);
+      startSlideshow();
     }
   } else {
     music.pause();
     button.innerHTML = "🎵 Play Our Song";
     playing = false;
   }
+}
+
+
+function startSlideshow() {
+  const slides = document.querySelectorAll('.slide');
+  if (!slides.length) return;
+  let index = 0;
+
+  function render() {
+    slides.forEach(slide => {
+      slide.classList.remove('active', 'prev', 'next');
+    });
+    slides[index].classList.add('active');
+    slides[(index - 1 + slides.length) % slides.length].classList.add('prev');
+    slides[(index + 1) % slides.length].classList.add('next');
+  }
+
+  render();
+  setInterval(() => {
+    index = (index + 1) % slides.length;
+    render();
+  }, 5000);
 }
 
 const heartsContainer = document.querySelector(".hearts");
